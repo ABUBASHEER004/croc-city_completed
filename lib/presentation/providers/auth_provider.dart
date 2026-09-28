@@ -93,30 +93,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signInWithGoogle() async {
-    loading = true;
-    error = null;
-    notifyListeners();
-
-    try {
-      await _service.signInWithGoogle();
-      await loadCurrentUser(notify: false, refreshAdminClaim: true);
-
-      if (currentUser == null) {
-        await _service.logout();
-        throw Exception(
-          'Your account profile could not be loaded. Please contact the academy administrator.',
-        );
-      }
-    } catch (e) {
-      error = _cleanError(e);
-      rethrow;
-    } finally {
-      loading = false;
-      notifyListeners();
-    }
-  }
-
   Future<void> resetPassword(String email) async {
     await _service.sendPasswordReset(email);
   }

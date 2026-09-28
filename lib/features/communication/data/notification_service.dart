@@ -105,7 +105,7 @@ class NotificationService {
     );
 
     await _localNotifications.initialize(
-      settings,
+      settings: settings,
       onDidReceiveNotificationResponse:
           _handleNotificationResponse,
     );
@@ -147,10 +147,10 @@ class NotificationService {
         .remainder(2147483647);
 
     await _localNotifications.show(
-      id,
-      title,
-      body,
-      const NotificationDetails(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           academyNotificationChannelId,
           academyNotificationChannelName,

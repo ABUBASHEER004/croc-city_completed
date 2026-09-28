@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../models/app_user.dart';
 
@@ -12,8 +11,6 @@ class AuthService {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-
   User? get currentUser => _auth.currentUser;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -110,67 +107,6 @@ class AuthService {
     }
   }
 
-  // ================= GOOGLE SIGN IN =================
-
-  Future<UserCredential> signInWithGoogle() async {
-    try {
-      await _googleSignIn.signOut();
-
-      final GoogleSignInAccount? googleUser =
-          await _googleSignIn.signIn();
-
-      if (googleUser == null) {
-        throw Exception("Google sign-in cancelled.");
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final userCredential =
-          await _auth.signInWithCredential(credential);
-
-      final user = userCredential.user!;
-
-      final userDoc =
-          _firestore.collection("users").doc(user.uid);
-
-      if (!(await userDoc.get()).exists) {
-        final names = (user.displayName ?? "").split(" ");
-
-        final firstName =
-            names.isNotEmpty ? names.first : "";
-
-        final lastName = names.length > 1
-            ? names.sublist(1).join(" ")
-            : "";
-
-        final appUser = AppUser(
-          uid: user.uid,
-          firstName: firstName,
-          lastName: lastName,
-          email: user.email ?? "",
-          username: (user.email ?? '').split('@').first,
-          phone: user.phoneNumber ?? "",
-          role: "Player",
-          emailVerified: user.emailVerified,
-          photoUrl: user.photoURL,
-          createdAt: DateTime.now(),
-        );
-
-        await userDoc.set(appUser.toMap());
-      }
-
-      return userCredential;
-    } on FirebaseAuthException catch (e) {
-      throw Exception(_firebaseError(e));
-    }
-  }
-
   // ================= PASSWORD RESET =================
 
   Future<void> sendPasswordReset(String email) async {
@@ -192,15 +128,8 @@ class AuthService {
   // ================= LOGOUT =================
 
   Future<void> logout() async {
-    // Firebase is the source of truth for the app session, so clear it
-    // first. Google sign-out is only a best-effort cleanup step.
+    // Firebase is the source of truth for the app session.
     await _auth.signOut();
-
-    try {
-      await _googleSignIn.signOut();
-    } catch (_) {
-      // A Google cleanup failure must never keep the user logged in.
-    }
   }
 
   Future<bool> hasAdminClaim({bool forceRefresh = false}) async {
