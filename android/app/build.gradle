@@ -1,44 +1,44 @@
 plugins {
-    id("com.android.application")
-    id("com.google.gms.google-services")
-    id("dev.flutter.flutter-gradle-plugin")
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+    id 'dev.flutter.flutter-gradle-plugin'
 }
 
 android {
-    namespace = "com.example.croc_city_football_academy"
-    compileSdk = 36
-    ndkVersion = flutter.ndkVersion
+    namespace 'com.example.croc_city_football_academy'
+    compileSdk 36
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+        coreLibraryDesugaringEnabled true
     }
 
     defaultConfig {
-        applicationId = "com.example.croc_city_football_academy"
-        minSdk = flutter.minSdkVersion
-        targetSdk = 36
-        multiDexEnabled = true
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        applicationId 'com.example.croc_city_football_academy'
+        minSdkVersion flutter.minSdkVersion
+        targetSdk 36
+        multiDexEnabled true
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
 
     buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("debug")
+        release {
+            signingConfig signingConfigs.debug
         }
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = '11'
     }
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 }
 
 flutter {
-    source = "../.."
+    source '../..'
 }
